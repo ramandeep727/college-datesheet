@@ -10,10 +10,20 @@
 </head>
 
 <body>
+    <script>
+if(localStorage.getItem("loggedIn")!=="yes"){
+    window.location="login.html";
+if(localStorage.getItem("system")==="OFF"){
+    document.body.innerHTML="<h2 style='text-align:center;margin-top:150px'>System Disabled by Administrator</h2>";    
+}
+</script>
+
 
 <div class="header">
     <h1>CGC University</h1>
     <p>Examination DateSheet Generator</p>
+    <button onclick="logout()">Logout</button>
+    <button onclick="disableSystem()">Disable System</button>
 </div>
 
 <div class="container">

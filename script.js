@@ -184,3 +184,14 @@ function exportExcel(){
     link.download="datesheet.xls";
     link.click();
 }
+function logout(){
+    localStorage.removeItem("loggedIn");
+    window.location.replace("login.html");
+}
+
+
+function disableSystem(){
+    localStorage.setItem("system","OFF");
+    alert("System Disabled by Admin");
+    logout();
+}
