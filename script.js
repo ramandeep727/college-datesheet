@@ -185,7 +185,7 @@ function exportExcel(){
     link.click();
 }
 function logout(){
-    localStorage.removeItem("loggedIn");
+    sessionStorage.removeItem("loggedIn");
     window.location.replace("login.html");
 }
 

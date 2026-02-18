@@ -57,8 +57,9 @@ function login(){
 
     if(user.value==="admin" && pass.value==="cgc123"){
 
-        localStorage.setItem("loggedIn","yes");
-        localStorage.setItem("system","ON");
+        sessionStorage.setItem("loggedIn","yes");
+        sessionStorage.setItem("system","ON");
+
 
         window.location="index.html";
     }
