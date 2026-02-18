@@ -1,8 +1,9 @@
 let holidays = [];
-let courses = [];
+let courses = {};
 
 function addCourse(){
 
+    let college = document.getElementById("college").value;
     let course = document.getElementById("course").value;
     let semester = document.getElementById("semester").value;
     let subjects = document.getElementById("subjects").value;
@@ -12,7 +13,11 @@ function addCourse(){
         return;
     }
 
-    courses.push({
+    if(!colleges[college]){
+        colleges[college] = [];
+    }
+
+    colleges[college].push({
         course,
         semester,
         subjects: subjects.split(",").map(s=>s.trim())
@@ -23,21 +28,28 @@ function addCourse(){
     showPreview();
 }
 
+
 function showPreview(){
 
-    let html = "<h3>Added Courses</h3>";
+    let html = "";
 
-    courses.forEach(c=>{
-        html += `<p>${c.course} - ${c.semester}: ${c.subjects.join(", ")}</p>`;
-    });
+    for(let college in colleges){
 
-    document.getElementById("preview").innerHTML = html;
+        html += `<h3>${college}</h3>`;
+
+        colleges[college].forEach(c=>{
+            html += `<p>${c.course} - ${c.semester}: ${c.subjects.join(", ")}</p>`;
+        });
+    }
+
+    preview.innerHTML = html;
 }
+
 function generate(){
 
     let startDate = document.getElementById("startDate").value;
 
-    if(courses.length==0 || !startDate){
+    if(Object.keys(colleges).length==0 || !startDate){
         alert("Add courses and start date");
         return;
     }
@@ -48,9 +60,15 @@ function generate(){
 
     let subjectSet = new Set();
 
-    courses.forEach(c=>{
-        c.subjects.forEach(s=>subjectSet.add(s));
+    let allSubjects = new Set();
+
+for(let college in colleges){
+    colleges[college].forEach(c=>{
+        c.subjects.forEach(s=>allSubjects.add(s));
     });
+}
+
+allSubjects = Array.from(allSubjects);
 
     let allSubjects = Array.from(subjectSet);
 
@@ -80,21 +98,29 @@ allSubjects.forEach(s=>{
 });
 
 
-    let output = "<table><tr><th>Course</th><th>Semester</th><th>Subject</th><th>Date</th><th>Slot</th></tr>";
+    let output = "<table><tr><th>College</th><th>Course</th><th>Semester</th><th>Subject</th><th>Date</th><th>Slot</th></tr>";
 
-    courses.forEach(c=>{
+for(let college in colleges){
+
+    colleges[college].forEach(c=>{
+
         c.subjects.forEach(s=>{
+
             output += `<tr>
+            <td>${college}</td>
             <td>${c.course}</td>
             <td>${c.semester}</td>
             <td>${s}</td>
             <td>${subjectDates[s].date}</td>
             <td>${subjectDates[s].slot}</td>
             </tr>`;
-        });
-    });
 
-    output += "</table>";
+        });
+
+    });
+}
+
+output += "</table>";
 
     result.innerHTML = output;
 }
