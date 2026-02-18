@@ -1,10 +1,37 @@
+let streamsByCourse = {
+    BTech:["CSE","ECE","ME","Civil"],
+    MTech:["CSE","ECE","ME","Civil"],
+    BCA:["General"],
+    MCA:["General"],
+    BBA:["General"],
+    MBA:["Marketing","Finance","HR"],
+    "B.COM":["Commerce"],
+    "M.COM":["Commerce"],
+    PHD:["Research"]
+};
+
+let colleges = {};
 let holidays = [];
-let courses = {};
+
+function updateStreams(){
+
+    let course = document.getElementById("course").value;
+    let stream = document.getElementById("stream");
+
+    stream.innerHTML = "";
+
+    streamsByCourse[course].forEach(x=>{
+        stream.innerHTML += `<option>${x}</option>`;
+    });
+}
+
+updateStreams();
 
 function addCourse(){
 
     let college = document.getElementById("college").value;
     let course = document.getElementById("course").value;
+    let stream = document.getElementById("stream").value;
     let semester = document.getElementById("semester").value;
     let subjects = document.getElementById("subjects").value;
 
@@ -19,15 +46,15 @@ function addCourse(){
 
     colleges[college].push({
         course,
+        stream,
         semester,
         subjects: subjects.split(",").map(s=>s.trim())
     });
 
-    document.getElementById("subjects").value = "";
+    subjects.value = "";
 
     showPreview();
 }
-
 
 function showPreview(){
 
@@ -38,18 +65,44 @@ function showPreview(){
         html += `<h3>${college}</h3>`;
 
         colleges[college].forEach(c=>{
-            html += `<p>${c.course} - ${c.semester}: ${c.subjects.join(", ")}</p>`;
+            html += `<p>${c.course} ${c.stream} - ${c.semester}: ${c.subjects.join(", ")}</p>`;
         });
     }
 
     preview.innerHTML = html;
 }
 
+function addHoliday(){
+
+    let h = holidayDate.value;
+
+    if(h){
+        holidays.push(new Date(h).toDateString());
+        holidayList.innerHTML = holidays.join(", ");
+    }
+}
+
+function getNextWorkingDate(date){
+
+    let d = new Date(date);
+
+    while(true){
+
+        let day = d.getDay();
+
+        if(skipSunday.checked && day===0){ d.setDate(d.getDate()+1); continue; }
+        if(skipSaturday.checked && day===6){ d.setDate(d.getDate()+1); continue; }
+        if(holidays.includes(d.toDateString())){ d.setDate(d.getDate()+1); continue; }
+
+        break;
+    }
+
+    return d;
+}
+
 function generate(){
 
-    let startDate = document.getElementById("startDate").value;
-
-    if(Object.keys(colleges).length==0 || !startDate){
+    if(Object.keys(colleges).length==0 || !startDate.value){
         alert("Add courses and start date");
         return;
     }
@@ -57,143 +110,77 @@ function generate(){
     let gap = Number(document.getElementById("gap").value);
     let slots = Number(document.getElementById("slots").value);
 
+    let set = new Set();
 
-    let subjectSet = new Set();
-
-    let allSubjects = new Set();
-
-for(let college in colleges){
-    colleges[college].forEach(c=>{
-        c.subjects.forEach(s=>allSubjects.add(s));
-    });
-}
-
-allSubjects = Array.from(allSubjects);
-
-    let allSubjects = Array.from(subjectSet);
-
-    let subjectDates = {};
-    let start = new Date(startDate);
-
-    let current = new Date(start);
-let slotIndex = 0;
-
-allSubjects.forEach(s=>{
-
-    current = getNextWorkingDate(current);
-
-    let slotName = (slotIndex % slots === 0) ? "Morning" : "Evening";
-
-    subjectDates[s] = {
-        date: current.toDateString(),
-        slot: slotName
-    };
-
-    slotIndex++;
-
-    // If both slots used, move to next day
-    if(slotIndex % slots === 0){
-        current.setDate(current.getDate() + gap);
-    }
-});
-
-
-    let output = "<table><tr><th>College</th><th>Course</th><th>Semester</th><th>Subject</th><th>Date</th><th>Slot</th></tr>";
-
-for(let college in colleges){
-
-    colleges[college].forEach(c=>{
-
-        c.subjects.forEach(s=>{
-
-            output += `<tr>
-            <td>${college}</td>
-            <td>${c.course}</td>
-            <td>${c.semester}</td>
-            <td>${s}</td>
-            <td>${subjectDates[s].date}</td>
-            <td>${subjectDates[s].slot}</td>
-            </tr>`;
-
+    for(let col in colleges){
+        colleges[col].forEach(c=>{
+            c.subjects.forEach(s=>set.add(s));
         });
+    }
 
+    let subjects = Array.from(set);
+
+    let current = new Date(startDate.value);
+    let slotIndex = 0;
+    let subjectDates = {};
+
+    subjects.forEach(s=>{
+
+        current = getNextWorkingDate(current);
+
+        subjectDates[s] = {
+            date: current.toDateString(),
+            slot: (slotIndex%slots==0) ? "Morning" : "Evening"
+        };
+
+        slotIndex++;
+
+        if(slotIndex%slots==0) current.setDate(current.getDate()+gap);
     });
-}
 
-output += "</table>";
+    let html = "<table><tr><th>College</th><th>Course</th><th>Stream</th><th>Semester</th><th>Subject</th><th>Date</th><th>Slot</th></tr>";
 
-    result.innerHTML = output;
-}
-function addHoliday(){
-
-    let h = document.getElementById("holidayDate").value;
-
-    if(h){
-        holidays.push(new Date(h).toDateString());
-        showHolidays();
-    }
-}
-
-function showHolidays(){
-    holidayList.innerHTML = "<b>Holidays:</b> " + holidays.join(", ");
-}
-function getNextWorkingDate(date){
-
-    let d = new Date(date);
-
-    while(true){
-
-        let day = d.getDay(); // 0 Sunday, 6 Saturday
-
-        if(skipSunday.checked && day===0){
-            d.setDate(d.getDate()+1);
-            continue;
-        }
-
-        if(skipSaturday.checked && day===6){
-            d.setDate(d.getDate()+1);
-            continue;
-        }
-
-        if(holidays.includes(d.toDateString())){
-            d.setDate(d.getDate()+1);
-            continue;
-        }
-
-        break;
+    for(let col in colleges){
+        colleges[col].forEach(c=>{
+            c.subjects.forEach(s=>{
+                html+=`<tr>
+                <td>${col}</td>
+                <td>${c.course}</td>
+                <td>${c.stream}</td>
+                <td>${c.semester}</td>
+                <td>${s}</td>
+                <td>${subjectDates[s].date}</td>
+                <td>${subjectDates[s].slot}</td>
+                </tr>`;
+            });
+        });
     }
 
-    return d;
+    html+="</table>";
+
+    result.innerHTML = html;
 }
+
 async function exportPDF(){
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    doc.text("College Examination DateSheet", 14, 10);
+    doc.autoTable({html:"#result table",startY:10});
 
-    doc.autoTable({
-        html: "#result table",
-        startY: 20
-    });
-
-    doc.save("DateSheet.pdf");
+    doc.save("datesheet.pdf");
 }
+
 function exportExcel(){
 
     let table = document.querySelector("#result table");
 
-    if(!table){
-        alert("Generate table first");
-        return;
-    }
+    if(!table){ alert("Generate first"); return; }
 
-    let html = table.outerHTML.replace(/ /g, '%20');
+    let html = table.outerHTML.replace(/ /g,"%20");
 
-    let link = document.createElement("a");
-
-    link.href = 'data:application/vnd.ms-excel,' + html;
-    link.download = 'DateSheet.xls';
-
+    let link=document.createElement("a");
+    link.href="data:application/vnd.ms-excel,"+html;
+    link.download="datesheet.xls";
     link.click();
 }
