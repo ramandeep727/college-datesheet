@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>College DateSheet Generator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<body>
+
+<h2>College Examination DateSheet Generator</h2>
+
+<p>Enter Courses like:</p>
+<p>BTech CSE | AI,CN,OS</p>
+<p>BCA | OS,DBMS</p>
+
+<select id="course">
+    <option>BTech CSE</option>
+    <option>BCA</option>
+    <option>MBA</option>
+</select>
+
+<select id="semester">
+    <option>Sem 1</option>
+    <option>Sem 2</option>
+    <option>Sem 3</option>
+    <option>Sem 4</option>
+    <option>Sem 5</option>
+    <option>Sem 6</option>
+</select>
+
+<br><br>
+
+<input id="subjects" placeholder="Enter subjects comma separated">
+
+<br><br>
+
+<button onclick="addCourse()">Add Course</button>
+
+<hr>
+
+<div id="preview"></div>
+
+
+<br><br>
+
+<label>Start Date:</label>
+<input type="date" id="startDate">
+
+<br><br>
+
+<label>Gap Days:</label>
+<input type="number" id="gap" value="1">
+
+<br><br>
+
+<br>
+
+<input type="checkbox" id="skipSunday" checked> Skip Sunday  
+<input type="checkbox" id="skipSaturday"> Skip Saturday  
+
+<br><br>
+<br><br>
+
+<label>Slots per day:</label>
+<select id="slots">
+    <option value="1">Morning only</option>
+    <option value="2">Morning + Evening</option>
+</select>
+
+<br><br>
+
+
+<label>Add Holiday:</label>
+<input type="date" id="holidayDate">
+<button onclick="addHoliday()">Add Holiday</button>
+
+<div id="holidayList"></div>
+
+<br>
+
+<button onclick="generate()">Generate DateSheet</button>
+<button onclick="exportPDF()">Export Table to PDF</button>
+<button onclick="exportExcel()">Export to Excel</button>
+
+
+
+<div id="result"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
