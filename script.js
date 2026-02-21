@@ -51,7 +51,12 @@ function addCourse(){
         subjects: subjects.split(",").map(s=>s.trim())
     });
 
-    subjects.value = "";
+    document.getElementById("subjects").value = "";
+    document.getElementById("semester").selectedIndex = 0;
+    document.getElementById("course").selectedIndex = 0;
+    updateStreams();
+    
+    document.getElementById("stream").selectedIndex = 0;
 
     showPreview();
 }
@@ -68,6 +73,7 @@ function showPreview(){
 
             html += `<div style="margin-bottom:8px">
             <b>${c.course} ${c.stream} - ${c.semester}</b>
+            <button onclick="editCourse('${college}',${i})">Edit</button>
             <button onclick="removeCourse('${college}',${i})">Remove</button><br>`;
 
             c.subjects.forEach((s,si)=>{
@@ -92,6 +98,26 @@ function removeCourse(college,index){
 
 function removeSubject(college,courseIndex,subjectIndex){
     colleges[college][courseIndex].subjects.splice(subjectIndex,1);
+    showPreview();
+}
+function editCourse(college,index){
+
+    let c = colleges[college][index];
+
+    document.getElementById("course").value = c.course;
+
+    updateStreams();
+
+    document.getElementById("stream").value = c.stream;
+    document.getElementById("semester").value = c.semester;
+    document.getElementById("subjects").value = c.subjects.join(",");
+
+    colleges[college].splice(index,1);
+
+    if(colleges[college].length===0){
+        delete colleges[college];
+    }
+
     showPreview();
 }
 function addHoliday(){
