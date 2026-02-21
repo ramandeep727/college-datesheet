@@ -64,22 +64,61 @@ function showPreview(){
 
         html += `<h3>${college}</h3>`;
 
-        colleges[college].forEach(c=>{
-            html += `<p>${c.course} ${c.stream} - ${c.semester}: ${c.subjects.join(", ")}</p>`;
+        colleges[college].forEach((c,i)=>{
+
+            html += `<div style="margin-bottom:8px">
+            <b>${c.course} ${c.stream} - ${c.semester}</b>
+            <button onclick="removeCourse('${college}',${i})">Remove</button><br>`;
+
+            c.subjects.forEach((s,si)=>{
+                html += `${s} <button onclick="removeSubject('${college}',${i},${si})">x</button> `;
+            });
+
+            html += "</div>";
         });
     }
 
     preview.innerHTML = html;
 }
+function removeCourse(college,index){
+    colleges[college].splice(index,1);
 
+    if(colleges[college].length===0){
+        delete colleges[college];
+    }
+
+    showPreview();
+}
+
+function removeSubject(college,courseIndex,subjectIndex){
+    colleges[college][courseIndex].subjects.splice(subjectIndex,1);
+    showPreview();
+}
 function addHoliday(){
 
     let h = holidayDate.value;
 
     if(h){
         holidays.push(new Date(h).toDateString());
-        holidayList.innerHTML = holidays.join(", ");
+        holidayDate.value="";
+        showHolidays();
     }
+}
+
+function showHolidays(){
+
+    let html="<b>Holidays:</b> ";
+
+    holidays.forEach((h,i)=>{
+        html += `${h} <button onclick="removeHoliday(${i})">x</button> `;
+    });
+
+    holidayList.innerHTML = html;
+}
+
+function removeHoliday(i){
+    holidays.splice(i,1);
+    showHolidays();
 }
 
 function getNextWorkingDate(date){
